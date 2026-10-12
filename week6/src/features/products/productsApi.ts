@@ -16,10 +16,13 @@ export const productsApi = createApi({
         return { data: MOCK_PRODUCTS };
       },
     }),
-    getProductById: builder.query<Product | undefined, string>({
+    getProductById: builder.query<Product, string>({
       queryFn: async (id) => {
         await new Promise<void>((resolve) => setTimeout(resolve, 300));
         const product = MOCK_PRODUCTS.find((p) => p.id === id);
+        if (!product) {
+          return { error: { status: 404, data: 'Không tìm thấy sản phẩm' } };
+        }
         return { data: product };
       },
     }),

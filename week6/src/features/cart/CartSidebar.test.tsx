@@ -18,7 +18,7 @@ const sampleItem: CartItem = {
   id: 'prod-1',
   name: 'MacBook Pro 14"',
   price: 52990000,
-  image: '',
+  image: 'https://example.com/macbook.jpg',
   quantity: 1,
 };
 
@@ -26,7 +26,7 @@ const sampleItem2: CartItem = {
   id: 'prod-2',
   name: 'iPhone 16 Pro',
   price: 29990000,
-  image: '',
+  image: 'https://example.com/iphone.jpg',
   quantity: 2,
 };
 
@@ -113,6 +113,10 @@ describe('CartSidebar — Integration Tests (RTL)', () => {
 
     // Nút giảm bây giờ không còn bị disable
     expect(decreaseBtn).not.toBeDisabled();
+
+    // Click nút giảm để giảm về 1
+    await user.click(decreaseBtn);
+    expect(screen.getByText('Tổng cộng (1 sản phẩm)')).toBeInTheDocument();
   });
 
   it('TC-14c: Click nút xóa (🗑️) → xóa đúng 1 item khỏi giỏ', async () => {
@@ -141,4 +145,25 @@ describe('CartSidebar — Integration Tests (RTL)', () => {
     const sidebar = container.querySelector('.cart-sidebar');
     expect(sidebar).not.toHaveClass('cart-sidebar--open');
   });
+
+  it('TC-14e: Click "Thanh toán ngay →" → hiển thị alert, clear cart và đóng modal', async () => {
+    const user = userEvent.setup();
+    const handleClose = jest.fn();
+    const alertMock = jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+    renderWithStore(
+      <CartSidebar isOpen={true} onClose={handleClose} />,
+      { cart: { items: [sampleItem] } }
+    );
+
+    const checkoutBtn = screen.getByText('Thanh toán ngay →');
+    await user.click(checkoutBtn);
+
+    expect(alertMock).toHaveBeenCalledTimes(1);
+    expect(handleClose).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Giỏ hàng trống')).toBeInTheDocument();
+
+    alertMock.mockRestore();
+  });
 });
+

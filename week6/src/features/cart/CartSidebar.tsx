@@ -61,7 +61,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               {items.map((item) => (
                 <li key={item.id} className="cart-item">
                   <img
-                    src={item.image}
+                    src={item.image || undefined}
                     alt={item.name}
                     className="cart-item__image"
                   />
